@@ -1,0 +1,45 @@
+#include "stm32f446xx.h"
+#include <stdio.h>
+#include <stdint.h>
+
+#define GPIOAEN			(1U<<0) //GPIOA ENABLE
+#define TIM2_EN			(1U<<0) //TIMER2 ENBLAE
+#define CEN_EN			(1U<<0) //COUNTER ENABLE
+#define SET_TOGGLE		(1U<<4) | (1U<<5) //SET THE TOGGLE MODE CCMR1 REGISTER
+#define COMPARE_EN		(1U<<0)  //ENABLE THE COMPARE MODE CCER REGISTER
+void output_compare()
+{
+	RCC->APB1ENR |=TIM2_EN;
+	TIM2->PSC = 16000-1; //SET PRESCALER VALUE
+	TIM2->ARR = 500-1;   //SET PERIOD VALUE
+	//SET OUTPUT COMPARE 1 SELECTION
+	TIM2->CCMR1 &=~(1U<<0);
+	TIM2->CCMR1 &=~(1U<<1);
+
+	TIM2->CCMR1 |=SET_TOGGLE;
+/*
+	TIM2->CCMR1 |=(1U<<4);
+	TIM2->CCMR1 |=(1U<<5);
+	TIM2->CCMR1 &=~(1U<<6); */
+
+	TIM2->CCER |=COMPARE_EN;
+
+	TIM2->CNT =0;  //CLEAR THE COUNTER
+
+	TIM2->CR1 |=CEN_EN;
+}
+int main()
+{
+	RCC->AHB1ENR |=GPIOAEN;
+	//PA5 CHANGE MODE FOE ALTERNATE FUNCTION
+	GPIOA->MODER |=(1U<<11);
+	GPIOA->MODER &=~(1U<<10);
+	//SET THE ALTERNATE FUNCTION PA5 TO AF2 SET TIM2_CH1
+	GPIOA->AFR[0] |=(1U<<20);
+	GPIOA->AFR[0] &=~(1U<<21);
+	GPIOA->AFR[0] &=~(1U<<22);
+	GPIOA->AFR[0] &=~(1U<<23);
+
+	output_compare();
+
+}
