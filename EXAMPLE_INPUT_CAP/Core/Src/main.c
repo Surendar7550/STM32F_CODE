@@ -1,0 +1,82 @@
+#include "stm32f446xx.h"
+#include <stdio.h>
+#include <stdint.h>
+
+//BUS ENABLE
+#define GPIOA_EN		(1U<<0)
+#define CR1_CEN_EN		(1U<<0)//COUNTER ENABLE FOR CR1 REGISTER
+#define CCER_CC1E_EN	(1U<<0)//CAPTURE/COMPARE ENABLE IN CCER REGISTER
+
+//OUTPUT MACROS FOR PA5 IN TIM2
+#define TIM2_EN			(1U<<0)
+
+//INPUT MACROS FOR PA6 IN TIM3
+#define TIM3_EN			(1U<<1)
+#define SR_CC1IF_EN     (1U<<1)  //CAPTURE/COMPARE INTERRUPT FLAG
+
+void output_compare(void)
+{
+	RCC->APB1ENR |=TIM2_EN;
+	TIM2->PSC =16000-1;
+	TIM2->ARR =1000-1;
+	//CONFIGURE OUTPUT
+	TIM2->CCMR1 &=~(1U<<0);
+	TIM2->CCMR1 &=~(1U<<1);
+	//ENABLE TOGGLE MODE
+	TIM2->CCMR1 |=(1U<<4);
+	TIM2->CCMR1 |=(1U<<5);
+	TIM2->CCMR1 &=~(1U<<6);
+	//ENABLE COMPARE MODE
+	TIM2->CCER |=CCER_CC1E_EN;
+	//CLEAR THE COUNTER
+	TIM2->CNT =0;
+	//ENABLE COUNTER
+	TIM2->CR1 |=CR1_CEN_EN;
+}
+void input_capture(void)
+{
+	RCC->APB1ENR |=TIM3_EN;
+	TIM3->PSC =16000-1;
+	//CONFIGURE INPUT
+	TIM3->CCMR1 |=(1U<<0);
+	TIM3->CCMR1 &=~(1U<<1);
+	//ENABLE CAPTURE MODE
+	TIM3->CCER |=CCER_CC1E_EN;
+	//NON INVERTED RAISHING EDGE
+	//TIM3->CCER &=~(1U<<1);
+	//TIM3->CCER &=~(1U<<3);
+	//ENABLE COUNTER
+	TIM3->CR1 |=CR1_CEN_EN;
+}
+int timestamp = 0;
+int main()
+{
+	// OUTPUT SECTION IS LED PIN PA5
+	RCC->AHB1ENR |=GPIOA_EN ;
+	//PA5 CHANGE ALTRATE FUNCTION
+	GPIOA->MODER |=(1U<<11);  // 1
+	GPIOA->MODER &=~(1U<<10); // 0
+	//CHANGE AF1 FOR TIM2_CH1
+	GPIOA->AFR[0] |=(1U<<20);
+	GPIOA->AFR[0] &=~(1U<<21);
+	GPIOA->AFR[0] &=~(1U<<22);
+	GPIOA->AFR[0] &=~(1U<<23);
+	output_compare();
+	//INPUT SECTION IS PA6
+	RCC->AHB1ENR |=GPIOA_EN;
+	//PA6 CHANGE ALTRATE FUNCTION
+	GPIOA->MODER |=(1U<<13);
+	GPIOA->MODER &=~(1U<<12);
+	//CHANGE AF2 FOR TIM3_CH1
+	GPIOA->AFR[0] &=~(1U<<24);
+	GPIOA->AFR[0] |=(1U<<25);
+	GPIOA->AFR[0] &=~(1U<<26);
+	GPIOA->AFR[0] &=~(1U<<27);
+	input_capture();
+	while(1)
+	{
+		while(!(TIM3->SR & SR_CC1IF_EN)){}
+		timestamp = TIM3->CCR1;
+	}
+	return 0;
+}

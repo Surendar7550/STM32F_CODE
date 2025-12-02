@@ -1,0 +1,8 @@
+../Core/Src/main.c:79:5:main	1
+../Core/Src/main.c:123:6:FillSensorData	2
+../Core/Src/main.c:133:6:SerializeSensorData	2
+../Core/Src/main.c:147:6:SendSensorData	2
+../Core/Src/main.c:165:6:SystemClock_Config	3
+../Core/Src/main.c:207:13:MX_USART2_UART_Init	2
+../Core/Src/main.c:240:13:MX_GPIO_Init	1
+../Core/Src/main.c:264:6:Error_Handler	1

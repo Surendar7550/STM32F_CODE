@@ -1,0 +1,14 @@
+../Liabrary/ds1302.c:10:13:DS1302_Delay	16	static
+../Liabrary/ds1302.c:15:13:DS1302_IO_Output	32	static
+../Liabrary/ds1302.c:24:13:DS1302_IO_Input	32	static
+../Liabrary/ds1302.c:33:13:DS1302_CE_High	8	static
+../Liabrary/ds1302.c:37:13:DS1302_CE_Low	8	static
+../Liabrary/ds1302.c:42:13:DS1302_WriteBit	16	static
+../Liabrary/ds1302.c:54:16:DS1302_ReadBit	16	static
+../Liabrary/ds1302.c:71:13:DS1302_WriteByte	24	static
+../Liabrary/ds1302.c:79:16:DS1302_ReadByte	24	static
+../Liabrary/ds1302.c:89:16:BCD_To_Dec	16	static
+../Liabrary/ds1302.c:94:6:DS1302_GPIO_Init	32	static
+../Liabrary/ds1302.c:115:6:DS1302_WriteRegister	16	static
+../Liabrary/ds1302.c:123:9:DS1302_ReadRegister	24	static
+../Liabrary/ds1302.c:133:6:DS1302_ReadTime	24	static

@@ -1,0 +1,2 @@
+../Library/shell.c:19:6:shell_init	8	static
+../Library/shell.c:23:6:shell_process	16	static
